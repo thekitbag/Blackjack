@@ -8,6 +8,7 @@ player_score = 0
 dealer_score = 0
 player_bust = False
 player_sticks = False
+blackjack = False
 
 def create_shoe(decks):
 #creates a shoe of X standard 52 card decks
@@ -28,7 +29,8 @@ def deal():
 		player_hand.append(shoe.pop())
 		dealer_hand.append(shoe.pop())
 	
-def evaluate_score(hand):	
+def evaluate_score(hand):
+	global blackjack
 	score = 0
 	values = []
 	pictures = ["T","J","Q","K"]
@@ -44,12 +46,15 @@ def evaluate_score(hand):
 	if "A" not in values:
 		return score
 	else:
-		if score < 22:
+		if len(hand) == 2 and score == 21:
+			blackjack = True
+		elif score < 22:
 			return score
 		else:
 			for x in values:
 				if x == "A":
-					score -= 10
+					if score > 21:
+						score -= 10
 			return score
 
 def update_scores():
@@ -63,13 +68,15 @@ def update_scores():
 
 def declare():
 	update_scores()
+	if blackjack == True:
+		print ""
 	if player_bust == True:
 		print ""
 		print "Player hand:", player_hand
 		print ""
 		print "Dealer's up-card:", dealer_hand[0]
 		print ""
-		print "You have", player_score		
+		print "You have", player_score				
 	else:		
 		print "Player hand:", player_hand
 		print ""
@@ -85,13 +92,10 @@ def possible_actions(hand,score):
 	blackjack = False
 	if hand[0][0] == hand[1][0]:
 		options.append("Split")
-	
 	if 12 > score > 8:
 		options.append("Double")
-
 	if score == 21:
 		blackjack = True	
-	
 	if blackjack == False:
 		return options
 	else:
@@ -124,16 +128,17 @@ create_shoe(6)
 shuffle()
 deal()
 declare()
-ask_action()
-declare()
-while player_bust == False and player_sticks == False:
-	ask_action()
-	declare()
-if player_bust == True:
-	print ""
-	print "Player bust, Dealer wins"
+if blackjack == False:
+	while player_bust == False and player_sticks == False:
+		ask_action()
+		declare()	
+	if player_bust == True:
+		print ""
+		print "Player bust, Dealer wins"
+	else:
+		print "Player Sticks"
 else:
-	print "Player Sticks"
+	print "Blackjack! Player wins"
 
 
 
@@ -143,8 +148,17 @@ else:
 #tests
 #print "There are", len(shoe), "remaining cards in the shoe"
 
-"""to-do list
+"""
+bugs
+tells you your options and says you have None when you hit blackjack
 
+to-do
+create two card special situations - blackjack, split, double, perfect pair, 21 + 3
+DRY in declare function
+deal with invalid inputs
+dealer play
 Make Start game a function
 Be able to split two pictures but not A9
+betting
+
 """
