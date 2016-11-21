@@ -24,12 +24,11 @@ def shuffle():
 	random.shuffle(shoe)
 
 def deal():
-	player_hand.append(shoe.pop())
-	dealer_hand.append(shoe.pop())
-	player_hand.append(shoe.pop())
-	dealer_hand.append(shoe.pop())
-
-def evaluate_player_score(hand):	
+	for i in range(2):
+		player_hand.append(shoe.pop())
+		dealer_hand.append(shoe.pop())
+	
+def evaluate_score(hand):	
 	score = 0
 	values = []
 	pictures = ["T","J","Q","K"]
@@ -53,36 +52,12 @@ def evaluate_player_score(hand):
 					score -= 10
 			return score
 
-def evaluate_dealer_score(hand):
-	score = 0
-	values = []
-	pictures = ["T","J","Q","K"]
-	for i in range(len(hand)):
-		values.append(hand[i][0])
-	for k in values:
-		if k == "A":
-			score += 11
-		elif k in pictures:
-			score += 10
-		else:
-			score += int(k)
-	if "A" not in values:
-		return hand, score
-	else:
-		if score < 22:
-			return hand, score
-		else:
-			for x in values:
-				if x == "A":
-					score -= 10
-			return score
-
 def update_scores():
 	global player_score
 	global dealer_score
 	global player_bust
-	player_score = evaluate_player_score(player_hand)
-	dealer_score = evaluate_dealer_score(dealer_hand)
+	player_score = evaluate_score(player_hand)
+	dealer_score = evaluate_score(dealer_hand)
 	if player_score > 21:
 		player_bust = True
 
@@ -139,7 +114,6 @@ def hit():
 def stick():
 	global player_sticks
 	player_sticks = True
-
 
 print ""
 print "Welcome to Blackjack"
