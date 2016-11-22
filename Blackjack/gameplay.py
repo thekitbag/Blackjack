@@ -2,6 +2,7 @@
 import random 
 import betting
 
+balance = 0
 shoe = []
 player_hand = []
 dealer_hand = []
@@ -124,8 +125,6 @@ print ""
 print "Welcome to Blackjack"
 print ""
 print ""
-
-betting.test_an_import()
 
 create_shoe(6)
 shuffle()
