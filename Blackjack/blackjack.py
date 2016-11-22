@@ -160,5 +160,6 @@ dealer play
 Make Start game a function
 Be able to split two pictures but not A9
 betting
+test
 
 """
