@@ -1,6 +1,6 @@
 #Blackjack game
 import random 
-import betting
+
 
 shoe = []
 player_hand = []
@@ -10,6 +10,8 @@ dealer_score = 0
 player_bust = False
 player_sticks = False
 blackjack = False
+player_wins = False
+push = False
 
 def create_shoe(decks):
 #creates a shoe of X standard 52 card decks
@@ -31,7 +33,6 @@ def deal():
 		dealer_hand.append(shoe.pop())
 	
 def evaluate_score(hand):
-	global blackjack
 	score = 0
 	values = []
 	pictures = ["T","J","Q","K"]
@@ -47,9 +48,7 @@ def evaluate_score(hand):
 	if "A" not in values:
 		return score
 	else:
-		if len(hand) == 2 and score == 21:
-			blackjack = True
-		elif score < 22:
+		if score < 22:
 			return score
 		else:
 			for x in values:
@@ -62,45 +61,92 @@ def update_scores():
 	global player_score
 	global dealer_score
 	global player_bust
+	global blackjack
 	player_score = evaluate_score(player_hand)
 	dealer_score = evaluate_score(dealer_hand)
 	if player_score > 21:
 		player_bust = True
+	if player_score == 21 and len(player_hand) == 2:
+		blackjack = True
+def spaces(number):
+	print ""*number
+
+
+def initial_declare():
+	global blackjack
+	update_scores()	
+	spaces(3)
+	print "                             Welcome to Blackjack"
+	spaces(2)		
+	print "Player hand:", player_hand
+	spaces(1)
+	print "Dealer's up-card:", dealer_hand[0]
+	spaces(1)
+	if blackjack == True:
+		print "Blackjack! Player wins!"
+	else:
+		print "You have", player_score
+		spaces(1)
+		print "your options are", possible_actions(player_hand,player_score)	
+	spaces(1)	
 
 def declare():
 	update_scores()
-	if blackjack == True:
-		print ""
 	if player_bust == True:
-		print ""
+		spaces(1)
 		print "Player hand:", player_hand
-		print ""
+		spaces(1)
 		print "Dealer's up-card:", dealer_hand[0]
-		print ""
-		print "You have", player_score				
-	else:		
+		spaces(1)
+		print "You have", player_score, 
+		print "Player bust. Dealer wins"
+	elif player_sticks == True:
+		spaces(1)
+		print "Player sticks on", player_score					
+	else:
+		spaces(1)		
 		print "Player hand:", player_hand
-		print ""
+		spaces(1)
 		print "Dealer's up-card:", dealer_hand[0]
-		print ""
+		spaces(1)
 		print "You have", player_score	
-		print ""
+		spaces(1)
 		print "your options are", possible_actions(player_hand,player_score)
-		print ""
+		spaces(1)
+
+def phase_two_declare():
+	update_scores()
+	spaces(1)		
+	print "Player hand:", player_hand
+	spaces(1)
+	print "Dealer's up-card:", dealer_hand
+	spaces(1)
+	print "Player_score:", player_score
+	print "Dealer has", dealer_score	
+	spaces(1)
+
+def final_declare():
+	if player_wins == True:
+		print spaces(2)
+		print "Player wins!"
+	elif push == True:
+		print spaces(2)
+		print "Push"
+	else:
+		print spaces(2)
+		print "Dealer wins"
+			
+
+
 
 def possible_actions(hand,score):
 	options = ["Hit", "Stick"]
-	blackjack = False
 	if hand[0][0] == hand[1][0]:
 		options.append("Split")
 	if 12 > score > 8:
 		options.append("Double")
-	if score == 21:
-		blackjack = True	
-	if blackjack == False:
-		return options
-	else:
-		return "Blackjack! Congratulations, you win."
+	return options	
+	
 
 def ask_action():
 	player_action = raw_input("Choose an option:")
@@ -120,28 +166,52 @@ def stick():
 	global player_sticks
 	player_sticks = True
 
-print ""
-print "Welcome to Blackjack"
-print ""
-print ""
+def dealer_play():
+	dealer_hand.append(shoe.pop())
 
-betting.test_an_import()
+def evaluate_winner():
+	global player_wins
+	global push
+	if dealer_score > 21:
+		player_wins == True
+	elif dealer_score > player_score:
+		player_wins = False
+	elif player_score > dealer_score:
+		player_wins = True	
+	else:
+		push = True	
+
 
 create_shoe(6)
 shuffle()
 deal()
-declare()
-if blackjack == False:
-	while player_bust == False and player_sticks == False:
+initial_declare()
+while player_bust == False and player_sticks == False and player_score < 21:
 		ask_action()
-		declare()	
-	if player_bust == True:
-		print ""
-		print "Player bust, Dealer wins"
-	else:
-		print "Player Sticks"
-else:
-	print "Blackjack! Player wins"
+		declare()
+if player_bust == False:		
+	phase_two_declare()
+	while dealer_score < 17:
+		dealer_play()
+		phase_two_declare()
+evaluate_winner()
+final_declare()		
+
+
+"""
+print spaces(5)
+print "player_hand=",player_hand
+print "dealer_hand=", dealer_hand 
+print "player_score=", player_score
+print "dealer_score=", dealer_score
+print "player_bust=", player_bust 
+print "player_sticks=", player_sticks
+print "blackjack=", blackjack 
+print "player_wins=", player_wins 
+print "push=", push 	
+"""
+
+	
 
 
 
