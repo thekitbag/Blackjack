@@ -1,6 +1,6 @@
 #Blackjack game
 import random 
-import betting
+
 
 shoe = []
 player_hand = []
@@ -68,9 +68,11 @@ def update_scores():
 		player_bust = True
 
 def declare():
+	global blackjack
 	update_scores()
 	if blackjack == True:
 		print ""
+		print "Blackjack! Player wins!"
 	if player_bust == True:
 		print ""
 		print "Player hand:", player_hand
@@ -90,17 +92,12 @@ def declare():
 
 def possible_actions(hand,score):
 	options = ["Hit", "Stick"]
-	blackjack = False
 	if hand[0][0] == hand[1][0]:
 		options.append("Split")
 	if 12 > score > 8:
 		options.append("Double")
-	if score == 21:
-		blackjack = True	
-	if blackjack == False:
-		return options
 	else:
-		return "Blackjack! Congratulations, you win."
+		return options
 
 def ask_action():
 	player_action = raw_input("Choose an option:")
@@ -125,21 +122,19 @@ print "Welcome to Blackjack"
 print ""
 print ""
 
-betting.test_an_import()
 
 create_shoe(6)
 shuffle()
 deal()
 declare()
-if blackjack == False:
-	while player_bust == False and player_sticks == False:
-		ask_action()
-		declare()	
-	if player_bust == True:
-		print ""
-		print "Player bust, Dealer wins"
-	else:
-		print "Player Sticks"
+while player_bust == False and player_sticks == False and blackjack == False:
+	ask_action()
+	declare()	
+if player_bust == True:
+	print ""
+	print "Player bust, Dealer wins"
+elif player_sticks == True:
+	print "Player Sticks"
 else:
 	print "Blackjack! Player wins"
 
