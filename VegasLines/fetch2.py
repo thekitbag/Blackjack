@@ -2,31 +2,15 @@ import urllib2
 import re
 from bs4 import BeautifulSoup
 response = urllib2.urlopen('http://www.paddypower.com/football/football-matches/premier-league?ev_oc_grp_ids=21481')
-html = response.read()
+html = response.read() 
 soup = BeautifulSoup(html, "html5lib")
-links = soup.find_all("a")
-divs = soup.find_all("div")
-titles = soup.find_all("h2")
-mydiv = soup.find_all("div", { "id" : "mod-goalscorermarkets-1068" })
-headers = soup.find_all("div", { "class" : "market-list-header" })
-odds = soup.find_all("div", { "class" : "runner-markets-container " })
-myheader = "market-name ui-924_71516247"
-myprice = "ui-runner-price ui-924_71516247-5851483 ui-fraction-price"
-headers1 = []
-prices1 = []
-theprices = []
-theheaders = []
-
-for item in mydiv:
-	headers1.append(item.text)
-
-for item in headers1:
-	item = re.sub(r'[\t\r\n]', '', item)
-
-print headers1
+findtitles = soup.find_all("h2")
+findodds =  soup.find_all("span", { "class" : 'odd'  })
 
 
 
+for odd in findodds:
+	print odd.text
 
 
 """
