@@ -1,18 +1,14 @@
 #recipemate
 from random import randint
+import time
 import sqlite3
-db = 'recipe_db.sqlite' 
+db = 'H:\Coding\LunchBuddy\lunchbuddy.sqlite' 
 conn = sqlite3.connect(db)
 c = conn.cursor()
-c.execute("SELECT count(*) FROM 'recipes'")
-row_count = c.fetchone()[0]
 
 
 """to do list
-move pritn statements out of run_program() and into their respective functions
-allow admin functions to accept a dictionary of data: datatype pairs
-create second table which is a big db of recipes from the internet
-allow the user to get the quickest, or the lowest calorie. and how many of them to fetch
+
 """
 class Admin(object):
 
@@ -69,78 +65,48 @@ class Admin(object):
 
 class Actions():		
 
-	def query(self, table, column, field):
-		#returns the whole row from the given table where field is in the given column
-		self.table = table
-		self.column = column
-		self.field = field
+	def lookup(self):
+		#returns the names of all the resturants that martch a certain criteria				
+		column = raw_input("What is your search criteria?")
+		field = raw_input("Which value are you looking for?")
 		conn = sqlite3.connect(db)
 		c = conn.cursor()
-		c.execute('SELECT title, ingredients FROM {tn} WHERE {cn} = "{cv}"'.\
-	        format(tn=table, cn=column, cv=field))
+		c.execute('SELECT * FROM restaurants WHERE {cn} = "{cv}"'.\
+	        format(cn=column, cv=field))
 		all_rows = c.fetchall()
-		print all_rows
+		print ""
+		for i in all_rows:
+			print i[1]
 
-	def ingredients_search(ingredient):
-		#asks the user for ana ingredient and searches the db for recipes that contain
-		ingredient = raw_input("name an ingredient that you already have, in lower case ")	
+	def log(self):
+		#allows the user to log a restaurant and its rating out of ten along with today's date
+		place = raw_input("Where did you eat?").lower()
+		rating = raw_input("How was it on a scale of 1-10")
+		date = time.strftime("%d/%m/%Y")
 		conn = sqlite3.connect(db)
 		conn.text_factory = str
 		c = conn.cursor()
-		c.execute('SELECT title FROM {tn} where {cn} like "%{cv}%"'.\
-	        format(tn='recipes', cn='ingredients', cv= ingredient))
-		all_titles = c.fetchall()
-		d = conn.cursor()
-		d.execute('SELECT ingredients FROM {tn} where {cn} like "%{cv}%"'.\
-	        format(tn='recipes', cn='ingredients', cv= ingredient))
-		all_ingredients = d.fetchall()
-		print all_titles
+		c.execute('insert into visits values ("{p}", "{d}", {r})'.\
+	        format(p=place, d=date, r=rating))
+		conn.commit()
+		conn.close()
 
-
-	def randomise(self):
-		#returns a random recipe to the user
-		num = randint(1,row_count)
+	def list_all(self, table):
+		self.table = table
 		conn = sqlite3.connect(db)
-		conn.text_factory = str
 		c = conn.cursor()
-		c.execute('SELECT title FROM {tn} where {cn} = "{cv}"'.\
-	        format(tn='recipes', cn='ID', cv= num))
-		recipe = c.fetchall()
-		print recipe
+		c.execute('SELECT * FROM {t}'.\
+	        format(t=table))
+		all_rows = c.fetchall()		
+		for i in all_rows:
+			print i[1]
 
 
-def run_program():
-	program_running = True
-	a = Admin()
-	b = Actions()
-	while program_running == True:
-		print "What do you want to do next? type the number on the left for the thing on the right:"
-		print	"1: add a column"
-		print	"2: run a query"
-		print	"3: get a random recipe"
-		print	"4: look up recipes with a speific ingredient"
-		print	"0: exit program"
-		choice = raw_input("")
-		if choice == "1":
-			table = raw_input("Which table?  ")
-			column = raw_input("What's the column name?  ")
-			datatype = raw_input("What data type will be in the column? INTEGER, TEXT, NULL, REAL, BLOB  ")		
-			a.add_column(table, column, datatype)
-		elif choice == "2":
-			table = raw_input("Which table do you want to query?  ")
-			column = raw_input("Which column do you want to look at?  ")
-			field = raw_input("what value are you looking for?  ")
-			b.query(table, column, field)
-		elif choice == "3":
-			b.randomise()
-		elif choice == "4":
-			b.ingredients_search()
-		elif choice == "0":
-			program_running = False		
-		else:
-			print "Was that an option? NO!" 			
+	
 
-run_program()
+
+
+
 
 
 
@@ -148,6 +114,28 @@ run_program()
 
 
 """
+
+
+def run_program():
+	program_running = True
+	a = Admin()
+	b = Actions()
+	print "Welcome to lunch buddy. too lazy to think up where to go for lunch? I'll try to help"
+	def options_menu():		
+		print	"1: View all options"
+		print	"0: exit program"
+		choice = raw_input("")
+		if choice == "1":
+			print "WIP"
+		elif choice == "0":
+			program_running = False	
+			print "Laters"
+		else:
+			print "Was that an option? NO!"
+	print "What do you want to do next?"	
+	options_menu()
+
+
 class Recipe(object):	
 	#mealtypes="lunch", "lunch/dinner", "dinner"
 	def __init__(self, ingredients, preptime, mealtype, gluten):
